@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="{{ get_locale() }}">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ _('Verify OTP - SecureBank') }}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-6 bg-white p-4 rounded shadow-sm">
+
+        <h2 class="mb-3 text-center text-primary">{{ _('OTP Verification') }}</h2>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <div class="alert alert-warning">
+              {{ messages[0] }}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('verify_otp', email=email, lang=get_locale()) }}">
+          <div class="mb-3">
+            <label for="otp" class="form-label">{{ _('One-Time Password') }}</label>
+            <input type="text" class="form-control" name="otp" required>
+          </div>
+          <button type="submit" class="btn btn-success w-100">{{ _('Verify OTP') }}</button>
+        </form>
+
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
