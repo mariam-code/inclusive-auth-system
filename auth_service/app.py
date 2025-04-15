@@ -8,6 +8,8 @@ from datetime import datetime, timedelta
 from dotenv import load_dotenv
 from models import db, User
 from utils import generate_otp, log_event  # Added log_event
+from werkzeug.security import generate_password_hash
+
 
 load_dotenv()
 
@@ -78,6 +80,35 @@ def verify_otp():
         return jsonify({'token': token}), 200
 
     return jsonify({'message': 'Invalid or expired OTP'}), 401
+
+@app.route('/register', methods=['POST'])
+def register_user():
+    data = request.get_json()
+    name = data.get('name')
+    email = data.get('email')
+    password = data.get('password')
+
+    if User.query.filter_by(email=email).first():
+        return jsonify({'message': 'User already exists'}), 400
+
+    hashed_pw = generate_password_hash(password)
+    new_user = User(name=name, email=email, password=hashed_pw)
+    db.session.add(new_user)
+    db.session.commit()
+    return jsonify({'message': 'User registered successfully'}), 201
+
+@app.route('/delete-user', methods=['POST'])
+def delete_user():
+    data = request.get_json()
+    email = data.get('email')
+
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({'message': 'User not found'}), 404
+
+    db.session.delete(user)
+    db.session.commit()
+    return jsonify({'message': f'User {email} deleted successfully'}), 200
 
 if __name__ == '__main__':
     app.run(port=5001, debug=True)
